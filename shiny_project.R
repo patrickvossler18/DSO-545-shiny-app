@@ -41,6 +41,8 @@ airport_info = read_csv("~/Dropbox/Spring 2019/DSO 545/shiny_app/airport_info.cs
 airline_carriers = read_csv("~/Dropbox/Spring 2019/DSO 545/shiny_app/airline_carriers.csv")
 airline_carriers = na.omit(airline_carriers)
 
+delays = readRDS("~/Dropbox/Spring 2019/DSO 545/shiny_app/delays_clean.rds")
+
 # We should probably make this layout look better
 ui <- shinyUI(
     fluidPage(
@@ -76,14 +78,26 @@ ui <- shinyUI(
                    ))
                )
                    ),
-                   tabPanel("Second tab name",
+                   tabPanel("Flight Delays",
                             mainPanel(
-                                column(8, align="center",
-                                       slickROutput("slickr", width="960px",height = 960)
-                                )
-                                
+                                column(3,offset = 4, withLoader(slickROutput("slickr", width="960px",height = 960),type = "html",loader="loader1"))
                             )
-                   )
+                   ),
+               tabPanel("Delays by Airline",
+                            
+                        sidebarPanel(
+                            helpText("Average Airline Delay Over 30 Minutes (February 2019)"),
+                            # Select variable for y-axis
+                            selectInput(inputId = "hour_leave", 
+                                        label = "Time you want to leave:",
+                                        choices = 1:24, 
+                                        selected = 1 )),
+                        mainPanel(
+                            plotOutput("secondplot")
+                        )
+                        
+               )
+               
 )
 )
 )
@@ -130,10 +144,17 @@ server <- function(input, output,session) {
     days_2019 = format(getDays(2019), "%d/%m/%Y")
     
     output$slickr <- renderSlickR({
-        imgs <- list.files("~/Dropbox/Spring 2019/DSO 545/shiny_app/", pattern=".gif", full.names = TRUE)
-        slickR(imgs)
+        imgs <- list.files("~/Dropbox/Spring 2019/DSO 545/shiny_app", pattern=".gif", full.names = TRUE)
+        imgs = imgs[c(3,4,5,1)]
+        slickR(imgs,slideIdx = list(1:5))
     })
         
+    output$secondplot = renderPlot({
+        # Put plot code here so that it returns the ggplot2 object
+        plt_data <- delays[delays$hour_depart > input$hour_leave,]
+        ggplot(plt_data, aes(x=plt_data$`Operating Carrier`, y=plt_data$`Average Number of Minutes of Delay (30 min late flights only)**`)) + 
+            geom_boxplot() + xlab("Operating Carrier") + ylab("Average Delay over 30 minutes")
+    })
     
     
     # output$secondplot = renderPlot({
@@ -444,7 +465,8 @@ console.log(childColumns)
         flight_flexible = flight_flexible %>% mutate(date = format(as_datetime(dTime,tz="America/Los_Angeles"), "%Y-%m-%d")) %>% group_by(date) %>% summarize(price = mean(price))
         
         prices_plot = ggplot(data=flight_flexible, aes(x=date, y=price, fill = price)) +
-            geom_bar(stat="identity") + scale_fill_gradient(low = "#dbe9b7", high = "#616f39")
+            geom_bar(stat="identity") + scale_fill_gradient(low = "#dbe9b7", high = "#616f39")+
+            geom_text(data=flight_flexible,aes(x=date,y=price,label=round(price,2)),vjust=0,size=8)
         print(prices_plot)
         })
         

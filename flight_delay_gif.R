@@ -22,6 +22,12 @@ sept11 = data_2001 %>% filter(Month == 9 & DayofMonth== 11)
 dec24 = readRDS("~/Downloads/Dec24_2018.rds")
 # dec24 = dec24 %>% filter(Dest != "ECP" & Origin != "ECP")
 dec24 = dec24 %>% filter(Origin %in%unique(airports$iata), Dest %in%unique(airports$iata))
+dec24[,5] = as.numeric(unlist(dec24[,5]))
+dec24[,6] = as.numeric(unlist(dec24[,6]))
+dec24[,7] = as.numeric(unlist(dec24[,7]))
+dec24[,8] = as.numeric(unlist(dec24[,8]))
+
+dec24 = dec24 %>% filter(Origin %in%unique(airports$iata), Dest %in%unique(airports$iata))
 
 
 airports <- read.csv("http://www.public.iastate.edu/~hofmann/looking-at-data/data/airports.csv")

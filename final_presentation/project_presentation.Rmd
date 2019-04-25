@@ -1,7 +1,7 @@
 ---
-title: "DSO 545 Presentation"
+title: "DSO 545 Presentation: Flight Delays"
 author: "Bradley Rava, Simeng Shao, Patrick Vossler <br /> <br /> USC Marshall DSO"
-date: "4/24/2019"
+date: "4/25/2019"
 output:
   xaringan::moon_reader:
     chakra: libs/remark-latest.min.js
@@ -22,7 +22,7 @@ header-includes:
 - \newcommand{\indep}{\rotatebox[origin=c]{90}{$\models$}}
 ---
 
-# Motivation
+# Project Motivation
 <video>
 <source src="dso545_presentation.mp4" type="video/mp4">
 </video>
